@@ -39,8 +39,9 @@ class Transaction {
 }
 
 class Block {
-    constructor(timestamp, transactions, previousHash = '') {
-        this.timestamp = timestamp;
+    constructor(index, transactions, previousHash = '') {
+        this.index = index;
+        this.timestamp = Date.now();
         this.transactions = transactions;
         this.previousHash = previousHash;
         this.hash = this.calculateHash();
@@ -48,7 +49,7 @@ class Block {
     }
 
     calculateHash() {
-        return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
+        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
     }
 
     mineBlock(difficulty) {
@@ -80,7 +81,7 @@ class BlockChain {
     }
 
     createGenesisBlock() {
-        return new Block(Date.parse('2021-04-29'), ["Genesis Block"], "0");
+        return new Block(0, ["Genesis Block"], "0");
     }
 
     getLatestBlock() {
@@ -96,7 +97,6 @@ class BlockChain {
 
         console.log('Block successfully mined!');
         this.chain.push(block);
-
         this.pendingTransactions = [];
     }
 
