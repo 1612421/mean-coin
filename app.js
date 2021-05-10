@@ -9,8 +9,10 @@ const expressHbs = require('express-handlebars');
 const HandleBars = require('handlebars');
 const HandlebarsIntl = require('handlebars-intl');
 const logger = require('morgan');
+const flash = require('connect-flash')
 //const MongoStore = require('connect-mongo')(session);
 
+const homeRoute = require('./routes/home');
 const keypairRoute = require('./routes/keypair');
 
 HandlebarsIntl.registerWith(HandleBars);
@@ -45,8 +47,12 @@ app.use(session({
     cookie: {maxAge: 180 * 60 * 1000} // Phút * giây * mili giây
 }));
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(flash());
 
+// add route
+app.use('/', homeRoute);
 app.use('/wallet', keypairRoute);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

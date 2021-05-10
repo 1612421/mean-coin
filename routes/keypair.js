@@ -1,11 +1,11 @@
 const express = require('express');
 const { render } = require('../app');
 const router = express.Router();
-
+const multer = require('../config/multer-memory');
 const { MeanWallet } = require('../blockchain/keypair');
 
 // GET /wallet/generate
-router.post('/register', (req, res, next) => {
+router.post('/create', (req, res, next) => {
     const { password } = req.body;
 
     if (!password) {
@@ -17,21 +17,35 @@ router.post('/register', (req, res, next) => {
     }
 
     const keypair = new MeanWallet(password);
-    res.json({ data: keypair.keyObject});
+    const dateString = (new Date()).toUTCString().replace(/, |:| /g, '-');
+    res.writeHead(200, { 'Content-Type': 'application/force-download', 'Content-disposition': `attachment; filename=keystore-${dateString}.txt` });
+    res.end(JSON.stringify(keypair.keyObject));
 });
 
 // POST /wallet/verify
-router.post('/login', (req, res) => {
-    const { keyObject1, password1 } = req.body;
-    const keypair = new MeanWallet();
-    keypair.import(password1, keyObject1);
+router.post('/verify', multer.single('keyObject'), (req, res) => {
+    let keyObject = null;
+    let keypair = null;
+
+    try {
+        keyObject = JSON.parse(req.file.buffer.toString());
+    } catch {
+        req.flash('error', 'keystore file is invalid');
+        return res.redirect('/');
+    }
+
+    try {
+        const { password } = req.body;
+        keypair = new MeanWallet();
+        keypair.import(password, keyObject);
+    } catch {
+        req.flash('error', 'password is incorrect');
+        return res.redirect('/');
+    }
 
     return res.json({
         publicKey: keypair.verify()
     });
 });
-
-
-
 
 module.exports = router;
