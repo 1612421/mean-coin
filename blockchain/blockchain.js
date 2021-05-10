@@ -1,6 +1,8 @@
 const SHA256 = require('crypto-js/sha256');
 const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
+const EthUtil = require('ethereumjs-util');
+const Wallet = require('ethereumjs-wallet').default;
 
 class Transaction {
     constructor(fromAddress, toAddress, amount) {
@@ -10,31 +12,40 @@ class Transaction {
     }
 
     calculateHash() {
-        return SHA256(this.fromAddress + this.toAddress + this.amount).toString();
+        const tx  = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount).toString());
+        return EthUtil.hashPersonalMessage(tx);
     }
 
-    signTransaction(signingKey) {
-        if (signingKey.getPublic('hex') !== this.fromAddress) {
+    signTransaction(wallet) {
+        if (wallet.getAddressString() !== this.fromAddress) {
             throw new Error("You cannot sign transactions for other wallets");
         }
 
         const hashTx = this.calculateHash();
-        const sig = signingKey.sign(hashTx, 'base64');
-        this.signature = sig.toDER('hex');
+        const sig = EthUtil.ecsign(hashTx, wallet.getPrivateKey());
+        this.signature = EthUtil.toRpcSig(sig.v, sig.r, sig.s);
     }
 
     isValid() {
-        if (this.fromAddress === null) {
-            return true;
+        try {
+            if (this.fromAddress === null) {
+                return true;
+            }
+    
+            if (!this.signature || this.signature.length === 0) {
+                throw new Error('No signature in this transaction');
+            }
+            
+            const hashTx = this.calculateHash();
+            const sig = EthUtil.fromRpcSig(this.signature);
+            const publicKey = EthUtil.ecrecover(hashTx, sig.v, sig.r, sig.s);
+            const address = Wallet.fromPublicKey(publicKey).getAddressString();
+    
+            return this.fromAddress === address;
+        } catch {
+            return false;
         }
-
-        if (!this.signature || this.signature.length === 0) {
-            throw new Error('No signature in this transaction');
-        }
-
-        const signingKey = ec.keyFromPublic(this.fromAddress, 'hex');
-
-        return signingKey.verify(this.calculateHash(), this.signature);
+        
     }
 }
 
@@ -100,8 +111,11 @@ class BlockChain {
         this.pendingTransactions = [];
     }
 
-    createTransaction(transaction) {
-        this.pendingTransactions.push(transaction);
+    createTransaction(wallet, toAddress, amount) {
+        const transaction = new Transaction(wallet.getAddressString(), toAddress, amount);
+        transaction.signTransaction(wallet);
+
+        return transaction;
     }
 
     addTransaction(transaction) {
@@ -111,6 +125,10 @@ class BlockChain {
 
         if (!transaction.isValid()) {
             throw new Error('Cannot add transaction to chain');
+        }
+
+        if (this.getBalanceOfAddress(fromAddress) < transaction.amount) {
+            throw new Error('Not enough balance');
         }
 
         this.pendingTransactions.push(transaction);

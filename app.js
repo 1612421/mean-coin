@@ -1,12 +1,17 @@
 const createError = require('http-errors');
 const express = require('express');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
+const session = require('express-session');
 const dotenv = require('dotenv');
 const path = require('path');
 const expressHbs = require('express-handlebars');
 const HandleBars = require('handlebars');
 const HandlebarsIntl = require('handlebars-intl');
 const logger = require('morgan');
+//const MongoStore = require('connect-mongo')(session);
+
+const keypairRoute = require('./routes/keypair');
 
 HandlebarsIntl.registerWith(HandleBars);
 
@@ -36,11 +41,12 @@ app.use(session({
     secret: 'fit-hcmus',
     resave: false,
     saveUninitialized: false,
-    store: new MongoStore({mongooseConnection: mongoose.connection}),
+    //store: new MongoStore({mongooseConnection: mongoose.connection}),
     cookie: {maxAge: 180 * 60 * 1000} // Phút * giây * mili giây
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/wallet', keypairRoute);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -55,7 +61,10 @@ app.use(function(err, req, res, next) {
   
     // render the error page
     res.status(err.status || 500);
-    res.json({messages: err.message});
-  });
+    res.json({
+        code: res.statusCode,
+        messages: err.message
+    });
+});
   
   module.exports = app; 
