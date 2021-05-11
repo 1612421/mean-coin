@@ -110,10 +110,10 @@ class BlockChain {
             return;
         }
 
-        const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
+        const rewardTx = new Transaction('MeanMasterWallet', miningRewardAddress, this.miningReward, 'Mine reward');
         this.pendingTransactions.push(rewardTx);
 
-        let block = new Block(Date.now(), this.pendingTransactions, this.getLatestBlock().hash);
+        let block = new Block(this.chain.length, this.pendingTransactions, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
 
         console.log('Block successfully mined!');
@@ -141,7 +141,7 @@ class BlockChain {
             throw new Error('Cannot add transaction to chain');
         }
 
-        if (this.getDetailOfAddress(fromAddress).balance < transaction.amount) {
+        if (this.getDetailOfAddress(transaction.fromAddress).balance < transaction.amount) {
             throw new Error('Not enough balance');
         }
 
@@ -156,13 +156,16 @@ class BlockChain {
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.fromAddress === address) {
-                    balance -= transaction.amount;
-                    transaction.index = i++;
-                    transaction.timestamp = block.timestamp;
-                    transactions.push(transaction);
+                    balance -= (-transaction.amount);
                 } else if (transaction.toAddress === address) {
-                    balance += transaction.amount;
+                    balance += (+transaction.amount);
+                } else {
+                    continue;
                 }
+
+                transaction.index = i++;
+                transaction.timestamp = block.timestamp;
+                transactions.push(transaction);
             }
         }
 

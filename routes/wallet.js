@@ -8,17 +8,7 @@ const { BlockChainStore } = require('../blockchain/blockchain');
 
 router.get('/', isAccessWallet, (req, res) => {
     const address = req.session.wallet.address;
-    let detail = BlockChainStore.getDetailOfAddress(address);
-    detail.transactions = [
-        {
-            hash: 'test123',
-            method: 'Transfer',
-            timestamp: +(new Date()),
-            fromAddress: address,
-            toAddress: '123123',
-            amount: 100
-        }
-    ]
+    const detail = BlockChainStore.getDetailOfAddress(address);
 
     res.render('wallet', {
         address,
@@ -75,6 +65,28 @@ router.post('/verify', multer.single('keyObject'), (req, res) => {
 router.get('/exit', (req, res) => {
     req.session.wallet = null;
     res.redirect('/');
+});
+
+
+// POST /wallet/buy
+router.post('/buy', isAccessWallet, (req, res) => {
+    const { amount } = req.body;
+
+    if (amount <= 0) {
+        res.status(400);
+
+        return res.json({
+            code: 400,
+            message: 'Invalid amount'
+        });
+    }
+
+    const tx = BlockChainStore.createBuyTransaction(req.session.wallet.address, amount);
+    const miner_address = process.env.MINER_ADDRESS;
+    BlockChainStore.addTransaction(tx);
+    BlockChainStore.minePendingTransactions(miner_address);
+
+    res.redirect('/wallet');
 });
 
 module.exports = router;
