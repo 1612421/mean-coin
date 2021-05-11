@@ -25,6 +25,7 @@ class MeanWallet {
                 }
             };
 
+            this.privateKey = dk.privateKey;
             this.keyObject = keythereum.dump(password, dk.privateKey, dk.salt, dk.iv, options);
         }
     }
@@ -32,29 +33,9 @@ class MeanWallet {
     import(password, keyObject) {
         this.keyObject = keyObject;
         this.privateKey = keythereum.recover(password, keyObject);
-    }
-
-    verify() {
         const wallet = Wallet.fromPrivateKey(this.privateKey);
-        const publicKey = wallet.getPublicKeyString();
-        const address = wallet.getAddressString();
-        const privateKey = wallet.getPrivateKeyString();
-        // const temp = Buffer.from('12312321sdasdasdasd');
-        // const msgHash = EthUtil.hashPersonalMessage(temp);
-        // const sig = EthUtil.ecsign(msgHash, wallet.getPrivateKey());
-        // const signature = EthUtil.toRpcSig(sig.v, sig.r, sig.s);
-        // const publicKeytest = '0x' + EthUtil.ecrecover(msgHash, sig.v, sig.r, sig.s).toString('hex');
-    
-        
-        return {
-            publicKey,
-            address,
-            privateKey,
-            // signature,
-            // publicKeytest,
-            // test: Wallet.fromPublicKey(EthUtil.ecrecover(msgHash, sig.v, sig.r, sig.s)).getAddressString()
-
-        };
+        this.publicKey = wallet.getPublicKeyString();
+        this.address = wallet.getAddressString();
     }
 }
 

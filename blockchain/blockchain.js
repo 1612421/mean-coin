@@ -5,14 +5,16 @@ const EthUtil = require('ethereumjs-util');
 const Wallet = require('ethereumjs-wallet').default;
 
 class Transaction {
-    constructor(fromAddress, toAddress, amount) {
+    constructor(fromAddress, toAddress, amount, method = 'transfer') {
         this.fromAddress = fromAddress;
         this.toAddress = toAddress;
         this.amount = amount;
+        this.method = method;
+        this.hash = this.calculateHash().toString('hex');
     }
 
     calculateHash() {
-        const tx  = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount).toString());
+        const tx  = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount + this.method).toString());
         return EthUtil.hashPersonalMessage(tx);
     }
 
@@ -28,7 +30,7 @@ class Transaction {
 
     isValid() {
         try {
-            if (this.fromAddress === null) {
+            if (this.fromAddress === 'MeanMasterWallet') {
                 return true;
             }
     
@@ -85,14 +87,18 @@ class Block {
 
 class BlockChain {
     constructor() {
-        this.chain = [this.createGenesisBlock()];
         this.difficulty = 2;
         this.pendingTransactions = [];
         this.miningReward = 100; // 100 USD 
+        this.chain = [this.createGenesisBlock()];
     }
 
     createGenesisBlock() {
-        return new Block(0, ["Genesis Block"], "0");
+        const tx = new Transaction('MeanMaster', 'MeanMasterWallet', 1000000);
+        let block = new Block(0, [tx], null);
+        block.mineBlock(this.difficulty);
+
+        return block;
     }
 
     getLatestBlock() {
@@ -100,6 +106,10 @@ class BlockChain {
     }
 
     minePendingTransactions(miningRewardAddress) {
+        if (this.pendingTransactions.length === 0) {
+            return;
+        }
+
         const rewardTx = new Transaction(null, miningRewardAddress, this.miningReward);
         this.pendingTransactions.push(rewardTx);
 
@@ -111,11 +121,15 @@ class BlockChain {
         this.pendingTransactions = [];
     }
 
-    createTransaction(wallet, toAddress, amount) {
-        const transaction = new Transaction(wallet.getAddressString(), toAddress, amount);
+    createTransaction(wallet, toAddress, amount, method) {
+        const transaction = new Transaction(wallet.getAddressString(), toAddress, amount, method);
         transaction.signTransaction(wallet);
 
         return transaction;
+    }
+
+    createBuyTransaction(toAddress, amount) {
+        return new Transaction('MeanMasterWallet', toAddress, amount, 'Transfer');
     }
 
     addTransaction(transaction) {
@@ -127,30 +141,41 @@ class BlockChain {
             throw new Error('Cannot add transaction to chain');
         }
 
-        if (this.getBalanceOfAddress(fromAddress) < transaction.amount) {
+        if (this.getDetailOfAddress(fromAddress).balance < transaction.amount) {
             throw new Error('Not enough balance');
         }
 
         this.pendingTransactions.push(transaction);
     }
 
-    getBalanceOfAddress(address) {
+    getDetailOfAddress(address) {
         let balance = 0;
+        const transactions = [];
+        let i = 1;
 
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.fromAddress === address) {
                     balance -= transaction.amount;
+                    transaction.index = i++;
+                    transaction.timestamp = block.timestamp;
+                    transactions.push(transaction);
                 } else if (transaction.toAddress === address) {
                     balance += transaction.amount;
                 }
             }
         }
 
-        return balance;
+        return { balance, transactions };
     }
 
     isChainValid() {
+        const firstBlock = this.chain[0];
+
+        if (firstBlock.hash !== firstBlock.calculateHash()) {
+            return false;
+        }
+
         for (let i = 1; i < this.chain.length; i++) {
             const currentBlock = this.chain[i]
             const previousBlock = this.chain[i - 1];
@@ -172,6 +197,13 @@ class BlockChain {
     }
 }
 
+const BlockChainStore = new BlockChain();
+console.log(JSON.stringify(BlockChainStore));
+
 module.exports.BlockChain = BlockChain;
 module.exports.Block = Block;
 module.exports.Transaction = Transaction;
+
+module.exports = {
+    BlockChain, Block, Transaction, BlockChainStore
+}

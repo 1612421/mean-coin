@@ -10,10 +10,11 @@ const HandleBars = require('handlebars');
 const HandlebarsIntl = require('handlebars-intl');
 const logger = require('morgan');
 const flash = require('connect-flash')
+const dateFormat = require('dateformat');
 //const MongoStore = require('connect-mongo')(session);
 
 const homeRoute = require('./routes/home');
-const keypairRoute = require('./routes/keypair');
+const keypairRoute = require('./routes/wallet');
 
 HandlebarsIntl.registerWith(HandleBars);
 
@@ -31,6 +32,9 @@ app.engine('.hbs', expressHbs({
             } else {
                 return opts.inverse(this)
             }
+        },
+        prettifyDate : function(timestamp) {
+            return dateFormat(timestamp, 'mm-dd-yyyy H:MM:ss');
         }
     }
 }));
@@ -48,6 +52,16 @@ app.use(session({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
+
+app.use((req, res, next) => {
+    if (req.session.wallet) {
+      res.locals.isLoggedIn = true;
+    } else {
+      res.locals.isLoggedIn = false;
+    }
+    
+    next();
+  });
 
 // add route
 app.use('/', homeRoute);

@@ -1,0 +1,40 @@
+<div class="container-fluid">
+    <div class="table-row" style="margin-top: 50px;">
+        <label><h3>Address:</h3></label>
+        <label style="font-size: 35px; margin-left: 15px;">{{ address }}</label>
+    </div>
+    <div class="table-row mt-3">
+        <label><h3>Balance:</h3></label>
+        <label style="font-size: 35px; margin-left: 15px;">{{ balance }}</label>
+    </div>
+    <div class="text-center mt-3"><h3>My history transaction</h3></div>
+    <table class="table table-hover mt-3">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Txn Hash</th>
+                <th scope="col">Method</th>
+                <th scope="col">Time</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{# if hasTransaction }}
+                {{# each transactions}}
+                    <tr>
+                        <th scope="row">{{this.index}}</th>
+                        <td>{{this.hash}}</td>
+                        <td>{{this.method}}</td>
+                        <td>{{prettifyDate this.timestamp}}</td>
+                        <td>{{this.fromAddress}}</td>
+                        <td>{{this.toAddress}}</td>
+                        <td>{{this.amount}}</td>
+                    </tr>
+                {{/each}}
+            {{/if}}
+        </tbody>
+    </table>
+
+</div>
