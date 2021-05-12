@@ -91,6 +91,7 @@ class BlockChain {
         this.pendingTransactions = [];
         this.miningReward = 100; // 100 USD 
         this.chain = [this.createGenesisBlock()];
+        this.isSyncing = false;
     }
 
     createGenesisBlock() {
@@ -138,10 +139,10 @@ class BlockChain {
         }
 
         if (!transaction.isValid()) {
-            throw new Error('Cannot add transaction to chain');
+            throw new Error('Transaction is invalid');
         }
 
-        if (this.getDetailOfAddress(transaction.fromAddress).balance < transaction.amount) {
+        if (+this.getDetailOfAddress(transaction.fromAddress).balance < +transaction.amount) {
             throw new Error('Not enough balance');
         }
 
@@ -156,7 +157,7 @@ class BlockChain {
         for (const block of this.chain) {
             for (const transaction of block.transactions) {
                 if (transaction.fromAddress === address) {
-                    balance -= (-transaction.amount);
+                    balance -= (+transaction.amount);
                 } else if (transaction.toAddress === address) {
                     balance += (+transaction.amount);
                 } else {

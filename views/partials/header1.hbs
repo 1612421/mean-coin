@@ -118,7 +118,7 @@
 <!-- Modal send coin -->
 <div class="modal fade" id="sendCoinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <form action="/wallet/create" method="POST">
+    <form action="/wallet/send" method="POST">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -126,15 +126,23 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group">
-                        <label for="exampleInputPassword1">Password</label>
-                        <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password"
-                            name="password" required>
-                    </div>
+                    <form action="/wallet/send" method="POST">
+                        <div class="row">
+                            <div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label" for="adr"><i class="fa fa-address-card"></i> Address</label>
+                                    <input class="form-control" type="text" id="adr" name="address" placeholder="0x123457b07d61f1b664b..." required>
+                                </div>
+
+                                 <div class="form-group mb-3">
+                                     <label class="form-label" for="Amount"><i class="fas fa-coins" style="color:orange;"></i> Amount</label>
+                                    <input class="form-control" type="number" id="amount" name="amount" placeholder="10.00" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal" data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrop">Access wallet</button>
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-primary" type="submit">OK</button>
                 </div>
@@ -227,7 +235,7 @@
                             </div>
                             <div class="form-group mt-3 justify-content-center">
                                 <label class="form-label" for="Amount">Amount</label>
-                                <input class="form-control" type="number" id="amount" name="amount" placeholder="10" min="0" required>
+                                <input class="form-control" type="number" id="amount" name="amount" placeholder="10.00" min="0" required>
                             </div>
                         </form>
                     </div>

@@ -5,8 +5,10 @@ const multer = require('../config/multer-memory');
 const { MeanWallet } = require('../blockchain/keypair');
 const isAccessWallet = require('../middleware/check-auth');
 const { BlockChainStore } = require('../blockchain/blockchain');
+const Wallet = require('ethereumjs-wallet').default;
 
 router.get('/', isAccessWallet, (req, res) => {
+    const messages = req.flash('error');
     const address = req.session.wallet.address;
     const detail = BlockChainStore.getDetailOfAddress(address);
 
@@ -14,7 +16,9 @@ router.get('/', isAccessWallet, (req, res) => {
         address,
         balance: detail.balance,
         hasTransaction: detail.transactions.length > 0,
-        transactions: detail.transactions
+        transactions: detail.transactions,
+        hasError: messages.length > 0,
+        messages
     });
 });
 
@@ -85,6 +89,33 @@ router.post('/buy', isAccessWallet, (req, res) => {
     const miner_address = process.env.MINER_ADDRESS;
     BlockChainStore.addTransaction(tx);
     BlockChainStore.minePendingTransactions(miner_address);
+
+    res.redirect('/wallet');
+});
+
+// POST /wallet/buy
+router.post('/send', isAccessWallet, (req, res) => {
+    const { amount, address } = req.body;
+
+    if (amount <= 0) {
+        res.status(400);
+
+        return res.json({
+            code: 400,
+            message: 'Invalid amount'
+        });
+    }
+    
+    try {
+        const privateKey = Buffer.from(req.session.wallet.privateKey);
+        const wallet = Wallet.fromPrivateKey(privateKey);
+        const tx = BlockChainStore.createTransaction(wallet, address, amount, 'Transfer');
+        const miner_address = process.env.MINER_ADDRESS;
+        BlockChainStore.addTransaction(tx);
+        BlockChainStore.minePendingTransactions(miner_address);
+    } catch (e) {
+        req.flash('error', e.message);
+    }
 
     res.redirect('/wallet');
 });
