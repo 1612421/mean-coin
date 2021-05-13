@@ -60,10 +60,11 @@ class Block {
         this.hash = this.calculateHash();
         this.nonce = 0;
         this.miner = miner;
+        this.reward = 0;
     }
 
     calculateHash() {
-        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce + this.miner).toString();
+        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce + this.miner + this.reward).toString();
     }
 
     mineBlock(difficulty) {
@@ -116,6 +117,7 @@ class BlockChain {
         this.pendingTransactions.push(rewardTx);
 
         let block = new Block(this.chain.length, this.pendingTransactions, miningRewardAddress, this.getLatestBlock().hash);
+        block.reward = this.miningReward;
         block.mineBlock(this.difficulty);
 
         console.log('Block successfully mined!');
@@ -213,19 +215,14 @@ class BlockChain {
         
 
         return blocks.map(element => { 
-            let amount = 0;
-
-            element.transactions.forEach(tx => {
-                amount += +tx.amount;
-            });
-
             return {
                 hash: element.hash, 
                 timestamp: element.timestamp, 
                 nonce: element.nonce, 
                 miner: element.miner,
                 tnxLength: element.transactions.length,
-                amount
+                amount,
+                reward: element.reward
             }
         });
     }
@@ -233,7 +230,7 @@ class BlockChain {
     getTopLatestTransactions(amount) {
         const transactions = [];
 
-        for (let i = this.chain.length - 1; i > 1; i--) {
+        for (let i = this.chain.length - 1; i > 0; i--) {
             for (const transaction of this.chain[i].transactions) {
                 if (amount > 0) { 
                     transactions.push({
@@ -246,6 +243,55 @@ class BlockChain {
         }
 
         return transactions;
+    }
+
+    findBlock(blockHash) {
+        for(const block of this.chain) {
+            if (block.hash) {
+                return block;
+            }
+        }
+
+        return null;
+    }
+
+    getBlockPagination(offset, limit) {
+        offset = +offset;
+        limit = +limit;
+        const length = +this.chain.length;
+        let blocks = [];
+        const maxOffset = Math.ceil((length - 1) / limit)
+
+
+        if (offset <= 0|| maxOffset < offset) {
+            blocks = [];
+        } else if (maxOffset === offset) {
+            blocks = this.chain.slice(1, limit);
+        } else {
+            blocks = this.chain.slice(length - offset * limit, length - offset * limit + limit).reverse();
+        }
+
+        blocks = blocks.map(element => ({
+            index: element.index,
+            hash: element.hash,
+            timestamp: element.timestamp,
+            txn: element.transactions.length,
+            miner: element.miner,
+            reward: element.reward
+        }));
+
+        let isHavePre = false;
+        let isHaveNext = false;
+
+        if (maxOffset > offset) {
+            isHaveNext = true;
+        } 
+
+        if (offset > 1) {
+            isHavePre = true;
+        }
+
+        return {isHavePre, isHaveNext, blocks}
     }
 }
 

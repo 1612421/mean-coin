@@ -16,6 +16,7 @@ const moment = require('moment');
 
 const homeRoute = require('./routes/home');
 const keypairRoute = require('./routes/wallet');
+const blockRoute = require('./routes/block');
 
 HandlebarsIntl.registerWith(HandleBars);
 
@@ -70,6 +71,7 @@ app.use((req, res, next) => {
 // add route
 app.use('/', homeRoute);
 app.use('/wallet', keypairRoute);
+app.use(blockRoute);
 
 
 // catch 404 and forward to error handler
