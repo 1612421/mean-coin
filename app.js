@@ -11,6 +11,7 @@ const HandlebarsIntl = require('handlebars-intl');
 const logger = require('morgan');
 const flash = require('connect-flash')
 const dateFormat = require('dateformat');
+const moment = require('moment');
 //const MongoStore = require('connect-mongo')(session);
 
 const homeRoute = require('./routes/home');
@@ -26,15 +27,18 @@ app.engine('.hbs', expressHbs({
     defaultLayout: 'layout',
     extname: '.hbs',
     helpers: {
-        if_equal : function(a, b, opts) {
+        if_equal: function (a, b, opts) {
             if (a === b) {
                 return opts.fn(this);
             } else {
                 return opts.inverse(this)
             }
         },
-        prettifyDate : function(timestamp) {
+        prettifyDate: function (timestamp) {
             return dateFormat(timestamp, 'mm-dd-yyyy H:MM:ss');
+        },
+        moment: function (timestamp) {
+            return moment(+timestamp).fromNow(false);
         }
     }
 }));

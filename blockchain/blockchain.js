@@ -14,7 +14,7 @@ class Transaction {
     }
 
     calculateHash() {
-        const tx  = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount + this.method).toString());
+        const tx = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount + this.method).toString());
         return EthUtil.hashPersonalMessage(tx);
     }
 
@@ -33,36 +33,37 @@ class Transaction {
             if (this.fromAddress === 'MeanMasterWallet') {
                 return true;
             }
-    
+
             if (!this.signature || this.signature.length === 0) {
                 throw new Error('No signature in this transaction');
             }
-            
+
             const hashTx = this.calculateHash();
             const sig = EthUtil.fromRpcSig(this.signature);
             const publicKey = EthUtil.ecrecover(hashTx, sig.v, sig.r, sig.s);
             const address = Wallet.fromPublicKey(publicKey).getAddressString();
-    
+
             return this.fromAddress === address;
         } catch {
             return false;
         }
-        
+
     }
 }
 
 class Block {
-    constructor(index, transactions, previousHash = '') {
+    constructor(index, transactions, miner, previousHash = '') {
         this.index = index;
         this.timestamp = Date.now();
         this.transactions = transactions;
         this.previousHash = previousHash;
         this.hash = this.calculateHash();
         this.nonce = 0;
+        this.miner = miner;
     }
 
     calculateHash() {
-        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce).toString();
+        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce + this.miner).toString();
     }
 
     mineBlock(difficulty) {
@@ -75,12 +76,12 @@ class Block {
     }
 
     hasValidTransaction() {
-        for(const tx of this.transactions) {
+        for (const tx of this.transactions) {
             if (!tx.isValid()) {
                 return false;
             }
         }
- 
+
         return true;
     }
 }
@@ -114,7 +115,7 @@ class BlockChain {
         const rewardTx = new Transaction('MeanMasterWallet', miningRewardAddress, this.miningReward, 'Mine reward');
         this.pendingTransactions.push(rewardTx);
 
-        let block = new Block(this.chain.length, this.pendingTransactions, this.getLatestBlock().hash);
+        let block = new Block(this.chain.length, this.pendingTransactions, miningRewardAddress, this.getLatestBlock().hash);
         block.mineBlock(this.difficulty);
 
         console.log('Block successfully mined!');
@@ -198,6 +199,53 @@ class BlockChain {
         }
 
         return true;
+    }
+
+    getTopLatestBlocks(amount) {
+        const length = this.chain.length;
+        let blocks = null;
+
+        if (amount >= length) {
+            blocks = this.chain.slice(1, length).reverse();
+        } else {
+            blocks = this.chain.slice(length - amount, length).reverse();
+        }
+        
+
+        return blocks.map(element => { 
+            let amount = 0;
+
+            element.transactions.forEach(tx => {
+                amount += +tx.amount;
+            });
+
+            return {
+                hash: element.hash, 
+                timestamp: element.timestamp, 
+                nonce: element.nonce, 
+                miner: element.miner,
+                tnxLength: element.transactions.length,
+                amount
+            }
+        });
+    }
+
+    getTopLatestTransactions(amount) {
+        const transactions = [];
+
+        for (let i = this.chain.length - 1; i > 1; i--) {
+            for (const transaction of this.chain[i].transactions) {
+                if (amount > 0) { 
+                    transactions.push({
+                        ...transaction,
+                        timestamp: this.chain[i].timestamp
+                    });
+                    amount--;
+                }
+            }
+        }
+
+        return transactions;
     }
 }
 

@@ -1,5 +1,6 @@
 {{# if hasError }}
-<div class="alert alert-danger text-center alert-dismissible fade show position-absolute" role="alert" style="width: 100%;">
+<div class="alert alert-danger text-center alert-dismissible fade show position-absolute" role="alert"
+    style="width: 100%;">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     {{# each messages}}
     {{this}}</br>
@@ -10,15 +11,21 @@
 
 <div class="container-fluid">
     <div class="table-row" style="margin-top: 50px;">
-        <label><h3>Address:</h3></label>
+        <label>
+            <h3>Address:</h3>
+        </label>
         <label style="font-size: 35px; margin-left: 15px;">{{ address }}</label>
     </div>
     <div class="table-row mt-3">
-        <label><h3>Balance:</h3></label>
-        <label style="font-size: 35px; margin-left: 15px;">{{ balance }}</label>
+        <label>
+            <h3>Balance:</h3>
+        </label>
+        <label style="font-size: 35px; margin-left: 15px;">{{ balance }} MEC</label>
     </div>
-    <div class="text-center mt-3"><h3>My history transaction</h3></div>
-    <table class="table table-hover mt-3">
+    <div class="text-center mt-3">
+        <h3>My history transaction</h3>
+    </div>
+    <table class="table table-hover mt-3 rounded">
         <thead class="table-dark">
             <tr>
                 <th scope="col">#</th>
@@ -30,21 +37,20 @@
                 <th scope="col">Value</th>
             </tr>
         </thead>
-        <tbody>
+        <tbody >
             {{# if hasTransaction }}
-                {{# each transactions}}
-                    <tr>
-                        <th scope="row">{{this.index}}</th>
-                        <td>{{this.hash}}</td>
-                        <td>{{this.method}}</td>
-                        <td>{{prettifyDate this.timestamp}}</td>
-                        <td>{{this.fromAddress}}</td>
-                        <td>{{this.toAddress}}</td>
-                        <td>{{this.amount}}</td>
-                    </tr>
-                {{/each}}
+            {{# each transactions}}
+            <tr>
+                <th scope="row">{{this.index}}</th>
+                <td class="text-truncate" style="max-width: 300px;">{{this.hash}}</td>
+                <td>{{this.method}}</td>
+                <td>{{prettifyDate this.timestamp}}</td>
+                <td class="text-truncate" style="max-width: 300px;">{{this.fromAddress}}</td>
+                <td class="text-truncate" style="max-width: 300px;">{{this.toAddress}}</td>
+                <td class="text-truncate" style="max-width: 300px;">{{this.amount}} MEC</td>
+            </tr>
+            {{/each}}
             {{/if}}
         </tbody>
     </table>
-
 </div>

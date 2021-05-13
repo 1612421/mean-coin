@@ -26,6 +26,7 @@
     "handlebars-intl": "^1.1.2",
     "http-errors": "^1.7.2",
     "keythereum": "^1.2.0",
+    "moment": "^2.29.1",
     "mongoose": "^5.12.7",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",

@@ -6,3 +6,119 @@
     {{/each}}
 </div>
 {{/if}}
+
+<div class="d-flex justify-content-center">
+    <div class="container-fluid row">
+        <div class="col card my-5 ms-5 me-1" style="">
+            <div class="card-header" style="font-size: 35px;">
+                <b>Latest Blocks</b>
+            </div>
+            <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example" tabindex="0"
+                style="overflow-y: scroll; height: 450px;">
+                <table class="table table-hover">
+                    <tbody>
+                        {{#if hasBlocks}}
+                        {{#each top10Blocks}}
+                        <tr>
+                            <td>
+                                <div class="d-flex" style="margin-bottom: -10px;">
+                                    <div class="form-group me-5">
+                                        <label class="form-label text-truncate " for="adr" style="width: 200px;">
+                                            <i class="fas fa-hashtag"></i>
+                                            <a class="text-decoration-none" href="/blocks/{{this.hash}}">{{this.hash}}</a>
+                                        </label>
+                                        <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
+                                            <i class="far fa-clock"></i>
+                                            {{moment this.timestamp}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="width: 200px;">
+                                        <label class="form-label text-truncate" style="width: 100%;">
+                                            <i class="fas fa-gift"></i>
+                                            <a class="text-decoration-none  " href="/address/{{this.miner}}">{{this.miner}}</a>
+                                        </label>
+                                        <div class="form-label text-muted text-truncate" style="margin-top: -10px; width: 100%;">
+                                            <a class="text-decoration-none" href="/txns/{{this.hash}}">{{this.tnxLength}} txns</a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2" style="width: 150px; margin-left: auto;">
+                                        <div class="d-flex justify-content-end">
+                                            <span class="badge bg-info text-dark text-truncate" style="line-height: 35px;">
+                                                {{this.amount}} MEC
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                        {{else}}
+                        <tr>
+                            <td>BlockChain is empty</td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-header text-center">
+                <a href="/blocks" class="btn btn-outline-info" style="width: 100%;">View all blocks</a>
+            </div>
+        </div>
+        <div class="col card my-5 ms-1 me-5">
+            <div class="card-header" style="font-size: 35px;">
+                <b>Latest Transactions</b>
+            </div>
+            <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example"
+                tabindex="0" style="overflow-y: scroll; height: 450px;">
+                <table class="table table-hover">
+                    <tbody>
+                        {{#if hasTransaction}}
+                        {{#each top10Tractions}}
+                        <tr>
+                            <td>
+                                <div class="d-flex" style="margin-bottom: -10px;">
+                                    <div class="form-group me-5">
+                                        <label class="form-label text-truncate " for="adr" style="width: 200px;">
+                                            <i class="fas fa-hashtag"></i>
+                                            <a class="text-decoration-none" href="/blocks/{{this.hash}}">{{this.hash}}</a>
+                                        </label>
+                                        <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
+                                            <i class="far fa-clock"></i>
+                                            {{moment this.timestamp}}
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="width: 200px;">
+                                        <label class="form-label text-truncate" style="width: 100%;">
+                                            From
+                                            <a class="text-decoration-none  " href="/address/{{this.fromAddress}}">{{this.fromAddress}}</a>
+                                        </label>
+                                        <div class="form-label text-truncate" style="margin-top: -10px; width: 100%;">
+                                            To
+                                            <a class="text-decoration-none" href="/address/{{this.toAddress}}">{{this.toAddress}}</a>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mt-2" style="width: 150px; margin-left: auto;">
+                                        <div class="d-flex justify-content-end">
+                                            <span class="badge bg-info text-dark text-truncate" style="line-height: 35px;">
+                                                {{this.amount}} MEC
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {{/each}}
+                        {{else}}
+                        <tr>
+                            <td>Transactions is empty</td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-header text-center">
+                <a href="/transactions" class="btn btn-outline-info" style="width: 100%;">View all transactions</a>
+            </div>
+        </div>
+    </div>
+</div>
