@@ -15,8 +15,8 @@ const moment = require('moment');
 //const MongoStore = require('connect-mongo')(session);
 
 const homeRoute = require('./routes/home');
-const keypairRoute = require('./routes/wallet');
-const blockRoute = require('./routes/block');
+const walletRoute = require('./routes/wallet');
+const detailRoute = require('./routes/detail');
 
 HandlebarsIntl.registerWith(HandleBars);
 
@@ -70,8 +70,8 @@ app.use((req, res, next) => {
 
 // add route
 app.use('/', homeRoute);
-app.use('/wallet', keypairRoute);
-app.use(blockRoute);
+app.use('/wallet', walletRoute);
+app.use(detailRoute);
 
 
 // catch 404 and forward to error handler

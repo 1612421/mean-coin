@@ -235,7 +235,8 @@ class BlockChain {
                 if (amount > 0) { 
                     transactions.push({
                         ...transaction,
-                        timestamp: this.chain[i].timestamp
+                        timestamp: this.chain[i].timestamp,
+                        blockHash: this.chain[i].hash
                     });
                     amount--;
                 }
@@ -291,7 +292,7 @@ class BlockChain {
             isHavePre = true;
         }
 
-        return {isHavePre, isHaveNext, blocks}
+        return {isHavePre, isHaveNext, blocks, maxOffset}
     }
 }
 
