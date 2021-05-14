@@ -3,6 +3,7 @@ const EC = require('elliptic').ec;
 const ec = new EC('secp256k1');
 const EthUtil = require('ethereumjs-util');
 const Wallet = require('ethereumjs-wallet').default;
+const sizeof = require('object-sizeof');
 
 class Transaction {
     constructor(fromAddress, toAddress, amount, method = 'transfer') {
@@ -64,7 +65,7 @@ class Block {
     }
 
     calculateHash() {
-        return SHA256(this.index + this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce + this.miner + this.reward).toString();
+        return SHA256(this.previousHash + this.timestamp + JSON.stringify(this.transactions) + this.nonce + this.miner + this.reward).toString();
     }
 
     mineBlock(difficulty) {
@@ -88,16 +89,17 @@ class Block {
 }
 
 class BlockChain {
-    constructor() {
-        this.difficulty = 2;
+    constructor(difficulty, initCoin) {
+        this.isMining = false;
+        this.difficulty = difficulty;
         this.pendingTransactions = [];
         this.miningReward = 100; // 100 USD 
-        this.chain = [this.createGenesisBlock()];
+        this.chain = [this.createGenesisBlock(initCoin)];
         this.isSyncing = false;
     }
 
-    createGenesisBlock() {
-        const tx = new Transaction('MeanMaster', 'MeanMasterWallet', 1000000);
+    createGenesisBlock(initCoin) {
+        const tx = new Transaction('MeanMaster', 'MeanMasterWallet', initCoin);
         let block = new Block(0, [tx], null);
         block.mineBlock(this.difficulty);
 
@@ -248,7 +250,10 @@ class BlockChain {
 
     findBlock(blockHash) {
         for(const block of this.chain) {
-            if (block.hash) {
+            if (block.hash === blockHash) {
+                block.difficulty = this.difficulty;
+                block.txn = block.transactions.length;
+                block.size = sizeof(block);
                 return block;
             }
         }
@@ -294,15 +299,25 @@ class BlockChain {
 
         return {isHavePre, isHaveNext, blocks, maxOffset}
     }
-}
 
-const BlockChainStore = new BlockChain();
-console.log(JSON.stringify(BlockChainStore));
+    findTransaction(hash) {
+        for (const block of this.chain) {
+            for (const transaction of block.transactions) {
+                if (transaction.hash === hash) {
+                    transaction.blockHash = block.hash;
+                    return transaction;
+                }
+            }
+        }
+
+        return null;
+    }
+}
 
 module.exports.BlockChain = BlockChain;
 module.exports.Block = Block;
 module.exports.Transaction = Transaction;
 
 module.exports = {
-    BlockChain, Block, Transaction, BlockChainStore
+    BlockChain, Block, Transaction
 }

@@ -48,7 +48,7 @@
         </div>
     </div>
     <div class="text-center mt-3">
-        <h3>My history transaction</h3>
+        <h3>History transaction</h3>
     </div>
     <table class="table table-hover mt-3 rounded">
         <thead class="table-dark">
@@ -66,6 +66,7 @@
             {{# if hasTransaction }}
             {{# each transactions}}
             <tr>
+                 <tr>
                 <th scope="row">{{this.index}}</th>
                 <td class="text-truncate" style="max-width: 300px;">
                     <a class="text-decoration-none  " href="/tx/{{this.hash}}">{{this.hash}}</a>

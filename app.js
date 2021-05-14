@@ -1,9 +1,11 @@
+require('dotenv').config();
+require('./blockchain/blockchain-store');
+
 const createError = require('http-errors');
 const express = require('express');
 const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const session = require('express-session');
-const dotenv = require('dotenv');
 const path = require('path');
 const expressHbs = require('express-handlebars');
 const HandleBars = require('handlebars');
@@ -18,11 +20,10 @@ const homeRoute = require('./routes/home');
 const walletRoute = require('./routes/wallet');
 const detailRoute = require('./routes/detail');
 
+require('./common/mining-schedule').startMineBlockSchedule();
+
 HandlebarsIntl.registerWith(HandleBars);
-
 const app = express();
-dotenv.config();
-
 app.set('views', path.join(__dirname, 'views'));
 app.engine('.hbs', expressHbs({
     defaultLayout: 'layout',

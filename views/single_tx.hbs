@@ -1,0 +1,94 @@
+<div class="container">
+    <div class="card m-5">
+        <div class="card-header">
+            <h3>Detail of transaction </h3>
+        </div>
+        <div class="card-body">
+            <form action="/wallet/send" method="POST">
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Transaction Hash:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{hash}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Block:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">
+                                            <a class="text-decoration-none  " href="/block/{{blockHash}}">{{blockHash}}</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Timestamp:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{prettifyDate timestamp}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">From:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">
+                                            <a class="text-decoration-none  " href="/address/{{fromAddress}}">{{fromAddress}}</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">To:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">
+                                            <a class="text-decoration-none  " href="/address/{{toAddress}}">{{toAddress}}</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Value:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{amount}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>

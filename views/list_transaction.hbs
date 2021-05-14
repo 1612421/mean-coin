@@ -1,0 +1,61 @@
+
+
+<div class="container-fluid">
+    <div class="text-center mt-3">
+        <h3>Transactions</h3>
+        <h4 class="text-muted">(max 10000 transactions)</h4>
+    </div>
+    <table class="table table-hover mt-3 rounded">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Txn Hash</th>
+                <th scope="col">Method</th>
+                <th scope="col">Block Hash</th>
+                <th scope="col">Age</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody >
+            {{# if hasTransaction }}
+            {{# each transactions}}
+            <tr>
+                <td class="text-truncate" style="max-width: 150px;"><a class="text-decoration-none  " href="/tx/{{this.hash}}">{{this.hash}}</a></th>
+                <td class="text-truncate" style="max-width: 150px;">{{this.method}}</td>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none  " href="/block/{{this.blockHash}}">
+                        {{this.blockHash}}
+                    </a>
+                </td>
+                <td>{{moment this.timestamp}}</td>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none  " href="/address/{{this.fromAddress}}">
+                        {{this.fromAddress}}
+                    </a>
+                </td>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none  " href="/address/{{this.toAddress}}">
+                        {{this.toAddress}}
+                    </a>
+                </td>
+                <td class="text-truncate" style="max-width: 150px;">{{this.amount}} MEC</td>
+            </tr>
+            {{/each}}
+            {{/if}}
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{# unless isHavePre }} disabled {{/unless}}">
+                <a class="page-link" href="/transactions/{{pre}}">Previous</a>
+            </li>
+            <li class="page-item disabled">
+                <a class="page-link" href="#">page {{offset}} of {{maxOffset}}</a>
+            </li>
+            <li class="page-item {{# unless isHaveNext }} disabled {{/unless}}">
+                <a class="page-link" href="/transactions/{{next}}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>

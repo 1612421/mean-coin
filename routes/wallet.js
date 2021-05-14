@@ -4,13 +4,13 @@ const router = express.Router();
 const multer = require('../config/multer-memory');
 const { MeanWallet } = require('../blockchain/keypair');
 const isAccessWallet = require('../middleware/check-auth');
-const { BlockChainStore } = require('../blockchain/blockchain');
+const { BlockchainStore } = require('../blockchain/blockchain-store');
 const Wallet = require('ethereumjs-wallet').default;
 
 router.get('/', isAccessWallet, (req, res) => {
     const messages = req.flash('error');
     const address = req.session.wallet.address;
-    const detail = BlockChainStore.getDetailOfAddress(address);
+    const detail = BlockchainStore.getDetailOfAddress(address);
 
     res.render('wallet', {
         address,
@@ -84,12 +84,15 @@ router.post('/buy', isAccessWallet, (req, res) => {
             message: 'Invalid amount'
         });
     }
-
-    const tx = BlockChainStore.createBuyTransaction(req.session.wallet.address, amount);
-    const miner_address = process.env.MINER_ADDRESS;
-    BlockChainStore.addTransaction(tx);
-    BlockChainStore.minePendingTransactions(miner_address);
-
+    try {
+        const tx = BlockchainStore.createBuyTransaction(req.session.wallet.address, amount);
+        const miner_address = process.env.MINER_ADDRESS;
+        BlockchainStore.addTransaction(tx);
+    } catch (e) {
+        req.flash('error', e.message);
+    }
+    
+    req.flash('message', 'Create transaction successful');
     res.redirect('/wallet');
 });
 
@@ -109,10 +112,10 @@ router.post('/send', isAccessWallet, (req, res) => {
     try {
         const privateKey = Buffer.from(req.session.wallet.privateKey);
         const wallet = Wallet.fromPrivateKey(privateKey);
-        const tx = BlockChainStore.createTransaction(wallet, address, amount, 'Transfer');
+        const tx = BlockchainStore.createTransaction(wallet, address, amount, 'Transfer');
         const miner_address = process.env.MINER_ADDRESS;
-        BlockChainStore.addTransaction(tx);
-        BlockChainStore.minePendingTransactions(miner_address);
+        BlockchainStore.addTransaction(tx);
+        BlockchainStore.minePendingTransactions(miner_address);
     } catch (e) {
         req.flash('error', e.message);
     }

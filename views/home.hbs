@@ -1,5 +1,5 @@
 {{# if hasError}}
-<div class="alert alert-danger text-center alert-dismissible fade show" role="alert">
+<div class="alert alert-danger text-center alert-dismissible fade show position-absolute" role="alert" style="width: 100%; z-index: 5">
     <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
     {{# each messages}}
     {{this}}</br>
@@ -25,7 +25,7 @@
                                     <div class="form-group me-5">
                                         <label class="form-label text-truncate " for="adr" style="width: 200px;">
                                             <i class="fas fa-hashtag"></i>
-                                            <a class="text-decoration-none" href="/blocks/{{this.hash}}">{{this.hash}}</a>
+                                            <a class="text-decoration-none" href="/block/{{this.hash}}">{{this.hash}}</a>
                                         </label>
                                         <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
                                             <i class="far fa-clock"></i>
@@ -80,7 +80,7 @@
                                     <div class="form-group me-5">
                                         <label class="form-label text-truncate " for="adr" style="width: 200px;">
                                             <i class="fas fa-hashtag"></i>
-                                            <a class="text-decoration-none" href="/blocks/{{this.hash}}">{{this.hash}}</a>
+                                            <a class="text-decoration-none" href="/tx/{{this.hash}}">{{this.hash}}</a>
                                         </label>
                                         <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
                                             <i class="far fa-clock"></i>

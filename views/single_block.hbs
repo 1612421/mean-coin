@@ -1,0 +1,114 @@
+<div class="container">
+    <div class="card m-5">
+        <div class="card-header">
+            <h3>Detail of block </h3>
+        </div>
+        <div class="card-body">
+            <form action="/wallet/send" method="POST">
+                <table class="table table-hover">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Block Index:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.index}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Block Hash:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.hash}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Timestamp:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{prettifyDate block.timestamp}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Transactions:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">
+                                            <a class="text-decoration-none  " href="/txns/{{block.hash}}">{{block.txn}}</a>
+                                        </label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Block Reward:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.reward}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Nonce:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.nonce}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Difficulty:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.difficulty}}</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row align-items-center">
+                                    <div class="col-2">
+                                        <label class="col-form-label">Size:</label>
+                                    </div>
+                                    <div class="col-auto">
+                                        <label class="col-form-label">{{block.size}} bytes</label>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
+    </div>
+</div>

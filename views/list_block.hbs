@@ -1,0 +1,50 @@
+
+
+<div class="container-fluid">
+    <div class="text-center mt-3">
+        <h3>Blocks</h3>
+    </div>
+    <table class="table table-hover mt-3 rounded">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Index</th>
+                <th scope="col">Hash</th>
+                <th scope="col">Age</th>
+                <th scope="col">Txn</th>
+                <th scope="col">Miner</th>
+                <th scope="col">Reward</th>
+            </tr>
+        </thead>
+        <tbody >
+            {{# if hasBlock }}
+            {{# each blocks}}
+            <tr>
+                <th scope="row">{{this.index}}</th>
+                <td class="text-truncate" style="max-width: 200px;"> 
+                    <a class="text-decoration-none  " href="/block/{{this.hash}}">{{this.hash}}</a>
+                </td>
+                <td>{{moment this.timestamp}}</td>
+                <td class="text-truncate" style="max-width: 100px;">{{this.txn}}</td>
+                <td class="text-truncate" style="max-width: 200px;">
+                    <a class="text-decoration-none  " href="/address/{{this.miner}}">{{this.miner}}</a>
+                </td>
+                <td class="text-truncate" style="max-width: 200px;">{{this.reward}} MEC</td>
+            </tr>
+            {{/each}}
+            {{/if}}
+        </tbody>
+    </table>
+    <nav aria-label="Page navigation example">
+        <ul class="pagination justify-content-center">
+            <li class="page-item {{# unless isHavePre }} disabled {{/unless}}">
+                <a class="page-link" href="/blocks/{{pre}}">Previous</a>
+            </li>
+            <li class="page-item disabled">
+                <a class="page-link" href="#">page {{offset}} of {{maxOffset}}</a>
+            </li>
+            <li class="page-item {{# unless isHaveNext }} disabled {{/unless}}">
+                <a class="page-link" href="/blocks/{{next}}">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>

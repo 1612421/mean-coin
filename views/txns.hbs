@@ -1,0 +1,36 @@
+
+
+<div class="container-fluid">
+    <div class="text-center mt-3">
+        <h4>Transactions of block</h4>
+        <h5 class="text-muted">(#{{blockHash}})</h5>
+    </div>
+    <table class="table table-hover mt-3 rounded">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">Txn Hash</th>
+                <th scope="col">Method</th>
+                <th scope="col">Block Hash</th>
+                <th scope="col">Age</th>
+                <th scope="col">From</th>
+                <th scope="col">To</th>
+                <th scope="col">Value</th>
+            </tr>
+        </thead>
+        <tbody >
+            {{# if hasTransaction }}
+            {{# each transactions}}
+            <tr>
+                <td class="text-truncate" style="max-width: 150px;">{{this.hash}}</th>
+                <td class="text-truncate" style="max-width: 150px;">{{this.method}}</td>
+                <td class="text-truncate" style="max-width: 150px;">{{this.blockHash}}</td>
+                <td>{{moment this.timestamp}}</td>
+                <td class="text-truncate" style="max-width: 150px;">{{this.fromAddress}}</td>
+                <td class="text-truncate" style="max-width: 150px;">{{this.toAddress}}</td>
+                <td class="text-truncate" style="max-width: 150px;">{{this.amount}} MEC</td>
+            </tr>
+            {{/each}}
+            {{/if}}
+        </tbody>
+    </table>
+</div>
