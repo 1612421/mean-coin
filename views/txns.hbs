@@ -10,7 +10,6 @@
             <tr>
                 <th scope="col">Txn Hash</th>
                 <th scope="col">Method</th>
-                <th scope="col">Block Hash</th>
                 <th scope="col">Age</th>
                 <th scope="col">From</th>
                 <th scope="col">To</th>
@@ -21,12 +20,23 @@
             {{# if hasTransaction }}
             {{# each transactions}}
             <tr>
-                <td class="text-truncate" style="max-width: 150px;">{{this.hash}}</th>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none" href="/tx/{{this.hash}}">
+                        {{this.hash}}
+                    </a>
+                </th>
                 <td class="text-truncate" style="max-width: 150px;">{{this.method}}</td>
-                <td class="text-truncate" style="max-width: 150px;">{{this.blockHash}}</td>
                 <td>{{moment this.timestamp}}</td>
-                <td class="text-truncate" style="max-width: 150px;">{{this.fromAddress}}</td>
-                <td class="text-truncate" style="max-width: 150px;">{{this.toAddress}}</td>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none" href="/address/{{this.fromAddress}}">
+                        {{this.fromAddress}}
+                    </a>
+                </td>
+                <td class="text-truncate" style="max-width: 150px;">
+                    <a class="text-decoration-none" href="/address/{{this.toAddress}}">
+                        {{this.toAddress}}
+                    </a>
+                </td>
                 <td class="text-truncate" style="max-width: 150px;">{{this.amount}} MEC</td>
             </tr>
             {{/each}}

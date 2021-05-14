@@ -24,7 +24,9 @@
                     <a class="text-decoration-none  " href="/block/{{this.hash}}">{{this.hash}}</a>
                 </td>
                 <td>{{moment this.timestamp}}</td>
-                <td class="text-truncate" style="max-width: 100px;">{{this.txn}}</td>
+                <td class="text-truncate" style="max-width: 100px;">
+                    <a class="text-decoration-none" href="/txns/{{this.hash}}">{{this.txn}}</a>
+                </td>
                 <td class="text-truncate" style="max-width: 200px;">
                     <a class="text-decoration-none  " href="/address/{{this.miner}}">{{this.miner}}</a>
                 </td>

@@ -118,7 +118,7 @@
 <!-- Modal send coin -->
 <div class="modal fade" id="sendCoinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <form action="/wallet/send" method="POST">
+    <form id="formSend">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -131,19 +131,19 @@
                             <div>
                                 <div class="form-group mb-3">
                                     <label class="form-label" for="adr"><i class="fa fa-address-card"></i> Address</label>
-                                    <input class="form-control" type="text" id="adr" name="address" placeholder="0x123457b07d61f1b664b..." required>
+                                    <input class="form-control" type="text" id="toAddress" name="address" placeholder="0x123457b07d61f1b664b..." required>
                                 </div>
 
                                  <div class="form-group mb-3">
                                      <label class="form-label" for="Amount"><i class="fas fa-coins" style="color:orange;"></i> Amount</label>
-                                    <input class="form-control" type="number" id="amount" name="amount" placeholder="10.00" min="0" required>
+                                    <input class="form-control" type="number" id="sendAmount" name="amount" placeholder="10.00" min="0" required>
                                 </div>
                             </div>
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="closeSendCoinModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-primary" type="submit">OK</button>
                 </div>
             </div>
@@ -154,7 +154,7 @@
 <!-- Modal buy coin -->
 <div class="modal fade" id="buyCoinModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
     aria-labelledby="staticBackdropLabel" aria-hidden="true">
-    <form action="/wallet/buy" method="POST">
+    <form id="formBuy">
         <div class="modal-dialog modal-xl">
             <div class="modal-content">
                 <div class="modal-header">
@@ -235,13 +235,13 @@
                             </div>
                             <div class="form-group mt-3 justify-content-center">
                                 <label class="form-label" for="Amount">Amount</label>
-                                <input class="form-control" type="number" id="amount" name="amount" placeholder="10.00" min="0" required>
+                                <input class="form-control" type="number" id="buyAmount" name="amount" placeholder="10.00" min="0" required>
                             </div>
                         </form>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button id="closeBuyModal" type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <button class="btn btn-primary" type="submit">OK</button>
                 </div>
             </div>

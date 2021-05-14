@@ -6,6 +6,7 @@ const { MeanWallet } = require('../blockchain/keypair');
 const isAccessWallet = require('../middleware/check-auth');
 const { BlockchainStore } = require('../blockchain/blockchain-store');
 const Wallet = require('ethereumjs-wallet').default;
+const { json } = require('body-parser');
 
 router.get('/', isAccessWallet, (req, res) => {
     const messages = req.flash('error');
@@ -88,15 +89,26 @@ router.post('/buy', isAccessWallet, (req, res) => {
         const tx = BlockchainStore.createBuyTransaction(req.session.wallet.address, amount);
         const miner_address = process.env.MINER_ADDRESS;
         BlockchainStore.addTransaction(tx);
-    } catch (e) {
-        req.flash('error', e.message);
+    } catch (err) {
+        res.status(500);
+        return res.json({
+            code: 500,
+            message: err.message
+        });
+        // req.flash('error', e.message);
     }
     
-    req.flash('message', 'Create transaction successful');
-    res.redirect('/wallet');
+    // req.flash('message', 'Create transaction successful');
+ 
+    res.json({
+        code: 200,
+        data: {
+            message: 'Create transaction successful. Waiting for verify!'
+        }
+    });
 });
 
-// POST /wallet/buy
+// POST /wallet/send
 router.post('/send', isAccessWallet, (req, res) => {
     const { amount, address } = req.body;
 
@@ -116,11 +128,20 @@ router.post('/send', isAccessWallet, (req, res) => {
         const miner_address = process.env.MINER_ADDRESS;
         BlockchainStore.addTransaction(tx);
         BlockchainStore.minePendingTransactions(miner_address);
-    } catch (e) {
-        req.flash('error', e.message);
+    } catch (err) {
+        res.status(500);
+        return res.json({
+            code: 500,
+            message: err.message
+        })
     }
 
-    res.redirect('/wallet');
+    return res.json({
+        code: 200,
+        data: {
+            message: 'Create transaction successful. Waiting for verify!'
+        }
+    })
 });
 
 module.exports = router;

@@ -90,7 +90,7 @@ app.use(function(err, req, res, next) {
     res.status(err.status || 500);
     res.json({
         code: res.statusCode,
-        messages: err.message
+        message: err.message
     });
 });
   
