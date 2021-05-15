@@ -3,6 +3,7 @@ const miningWorker = require('../blockchain/worker-mining');
 const { BlockchainStore } = require('../blockchain/blockchain-store');
 const { Transaction } = require('../blockchain/blockchain');
 const APP_CONFIG = require('../config/constant');
+const { sendTransactionToClientRoom, broadcastNewMinedBlock } = require('../blockchain/networkMaster');
 var job = null;
 
 function startMineBlockSchedule() {
@@ -20,17 +21,32 @@ function startMineBlockSchedule() {
             miningReward: BlockchainStore.miningReward,
             difficulty: BlockchainStore.difficulty
         };
+        
+        let newMinedBlock = null;
 
         try {
             BlockchainStore.pendingTransactions = [];
-            const newMinedBlock = await miningWorker.runWorker(miningData);
+            newMinedBlock = await miningWorker.runWorker(miningData);
             newMinedBlock.index = BlockchainStore.chain.length;
-            BlockchainStore.chain.push(newMinedBlock);
+
+            if (BlockchainStore.isNewBlockValid(newMinedBlock)) {
+                BlockchainStore.chain.push(newMinedBlock);
+            } else {
+                throw new Error('block is valid');
+            }
+
+            await broadcastNewMinedBlock(newMinedBlock);
         } catch (err) {
             console.log(err);
+            newMinedBlock = null;
             BlockchainStore.pendingTransactions.push(miningData.transactions);
         } finally {
             BlockchainStore.isMining = false;
+        }
+
+        if (newMinedBlock) {
+            sendTransactionToClientRoom(newMinedBlock.timestamp,  newMinedBlock.transactions);
+            
         }
     });
 }

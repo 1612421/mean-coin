@@ -205,6 +205,29 @@ class BlockChain {
         return true;
     }
 
+    isNewBlockValid(newBlock) {
+        const latestBlock = this.getLatestBlock();
+        const newBlockObject = new Block(newBlock.index, newBlock.transactions, newBlock.miner, newBlock.previousHash);
+        newBlockObject.timestamp = newBlock.timestamp;
+        newBlockObject.nonce = newBlock.nonce;
+        newBlockObject.reward = newBlock.reward;
+        newBlockObject.hash = newBlockObject.calculateHash();
+
+        if (latestBlock.index !== newBlock.index - 1) {
+            return false
+        }
+
+        if (newBlock.hash !== newBlockObject.hash) {
+            return false;
+        }
+
+        if (newBlock.previousHash !== latestBlock.hash) {
+            return false;
+        }
+
+        return true;
+    }
+
     getTopLatestBlocks(amount) {
         const length = this.chain.length;
         let blocks = null;

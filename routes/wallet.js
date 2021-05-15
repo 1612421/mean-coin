@@ -17,7 +17,7 @@ router.get('/', isAccessWallet, (req, res) => {
         address,
         balance: detail.balance,
         hasTransaction: detail.transactions.length > 0,
-        transactions: detail.transactions,
+        transactions: detail.transactions.reverse(),
         hasError: messages.length > 0,
         messages
     });
@@ -87,7 +87,6 @@ router.post('/buy', isAccessWallet, (req, res) => {
     }
     try {
         const tx = BlockchainStore.createBuyTransaction(req.session.wallet.address, amount);
-        const miner_address = process.env.MINER_ADDRESS;
         BlockchainStore.addTransaction(tx);
     } catch (err) {
         res.status(500);
@@ -95,10 +94,7 @@ router.post('/buy', isAccessWallet, (req, res) => {
             code: 500,
             message: err.message
         });
-        // req.flash('error', e.message);
     }
-    
-    // req.flash('message', 'Create transaction successful');
  
     res.json({
         code: 200,
@@ -125,9 +121,7 @@ router.post('/send', isAccessWallet, (req, res) => {
         const privateKey = Buffer.from(req.session.wallet.privateKey);
         const wallet = Wallet.fromPrivateKey(privateKey);
         const tx = BlockchainStore.createTransaction(wallet, address, amount, 'Transfer');
-        const miner_address = process.env.MINER_ADDRESS;
         BlockchainStore.addTransaction(tx);
-        BlockchainStore.minePendingTransactions(miner_address);
     } catch (err) {
         res.status(500);
         return res.json({

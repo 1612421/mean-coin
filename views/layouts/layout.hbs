@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" type="text/css" href="/bootstrap-5.0.0-dist/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="/assets/css/all.min.css">
+    <script src="/assets/js/moment.js"></script>
+    <script src="/assets/js/socket.io.min.js"></script>
     <script src="/assets/js/jquery-3.6.0.min.js"></script>
     <script src="/assets/js/jquery.form.min.js"></script>
     <script src="/assets/js/generate-html.js"></script>
@@ -15,14 +17,19 @@
 
 <body>
     {{> header1 }}
+
+    <input type="text" id="myAddress" value="{{myAddress}}" hidden>
+
     {{{body}}}
     
-    <div id="toastContainer" class="toast-container position-absolute top-0 end-0 p-3">
+    <div id="toastContainer" class="toast-container position-absolute top-0 start-0 p-3">
 
     </div>
+
     <script src="/bootstrap-5.0.0-dist/js/bootstrap.min.js"></script>
     <script src="/assets/js/popper.min.js"></script>
     <script src="/assets/js/interact.js"></script>
+    <script src="/assets/js/mean-coin-socket.js"></script>
 </body>
 
 </html>

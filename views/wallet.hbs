@@ -37,7 +37,7 @@
                                         <label class="col-form-label">Wallet balance:</label>
                                     </div>
                                     <div class="col-auto">
-                                        <label class="col-form-label">{{balance}} MEC</label>
+                                        <label id="myBalance" class="col-form-label" >{{balance}} MEC</label>
                                     </div>
                                 </div>
                             </td>
@@ -50,7 +50,7 @@
     <div class="text-center mt-3">
         <h3>My history transaction</h3>
     </div>
-    <table class="table table-hover mt-3 rounded">
+    <table id="myHistoryTxTable" class="table table-hover mt-3 rounded">
         <thead class="table-dark">
             <tr>
                 <th scope="col">#</th>

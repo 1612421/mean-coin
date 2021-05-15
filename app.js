@@ -20,8 +20,6 @@ const homeRoute = require('./routes/home');
 const walletRoute = require('./routes/wallet');
 const detailRoute = require('./routes/detail');
 
-require('./common/mining-schedule').startMineBlockSchedule();
-
 HandlebarsIntl.registerWith(HandleBars);
 const app = express();
 app.set('views', path.join(__dirname, 'views'));
@@ -62,6 +60,7 @@ app.use(flash());
 app.use((req, res, next) => {
     if (req.session.wallet) {
       res.locals.isLoggedIn = true;
+      res.locals.myAddress = req.session.wallet.address;
     } else {
       res.locals.isLoggedIn = false;
     }

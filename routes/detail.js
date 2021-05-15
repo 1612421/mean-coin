@@ -94,7 +94,7 @@ router.get('/address/:address', (req, res) => {
     const address = req.params.address;
     const detail = BlockchainStore.getDetailOfAddress(address);
 
-    if (detail.balance ===0 && detail.transactions.length === 0) {
+    if (detail.balance === 0 && detail.transactions.length === 0) {
         req.flash('error', 'Page is not found');
         return res.redirect('/');
     }
@@ -103,7 +103,7 @@ router.get('/address/:address', (req, res) => {
         address,
         balance: detail.balance,
         hasTransaction: detail.transactions.length > 0,
-        transactions: detail.transactions,
+        transactions: detail.transactions.reverse(),
         hasError: messages.length > 0,
         messages
     });
