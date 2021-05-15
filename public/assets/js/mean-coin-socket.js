@@ -5,17 +5,18 @@ socket.on('connect', () => {
     socket.emit('client');
 });
 
-socket.on('TRANSACTION', (data) => {
-    console.log(data);
+socket.on('BLOCK', (data) => {
     const myAddress = $('#myAddress').val(); 
     
 
     if (myAddress) {
         const myBalance = $('#myBalance');
         const myHistoryTxTable = $('#myHistoryTxTable tbody');
+        const latestBlockView = $('#latestBlockTable tbody')
         let amount = 0;
         let isHaveMyTransaction = false;
         const needAppendTxTb = window.location.pathname === '/wallet';
+        const needAppendLatestBlockTb = window.location.pathname === '/';
 
 
         data.transactions.forEach(transaction => {
@@ -38,7 +39,7 @@ socket.on('TRANSACTION', (data) => {
             }
         });
 
-        if (myBalance) {
+        if (needAppendTxTb) {
             const totalAmount = parseInt(myBalance.html().split(' ')[0]) + amount;
             myBalance.html(totalAmount + ' MEC');
             isHaveMyTransaction = true;
@@ -46,6 +47,10 @@ socket.on('TRANSACTION', (data) => {
 
         if (isHaveMyTransaction) {
             showToast('success', 'Have new your transaction is verified!');
+        }
+
+        if (needAppendLatestBlockTb) {
+            latestBlockView.prepend(newRecordLatestBlockTable(data));
         }
     } 
 });

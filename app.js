@@ -38,7 +38,8 @@ app.engine('.hbs', expressHbs({
             return dateFormat(timestamp, 'mm-dd-yyyy H:MM:ss');
         },
         moment: function (timestamp) {
-            return moment(+timestamp).fromNow(false);
+            //return moment(+timestamp).fromNow(false);
+            return moment(+timestamp).format('MM-DD-YYYY H:mm:ss');
         }
     }
 }));

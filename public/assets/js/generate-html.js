@@ -76,3 +76,42 @@ function newRecordTableMyHsTx(transaction) {
     </tr>
     `
 }
+
+function newRecordLatestBlockTable(block) {
+    const timestamp = moment(+block.timestamp).format('MM-DD-YYYY H:mm:ss');
+
+    return `
+    <tr>
+        <td>
+            <div class="d-flex" style="margin-bottom: -10px;">
+                <div class="form-group me-5">
+                    <label class="form-label text-truncate " for="adr" style="width: 200px;">
+                        <i class="fas fa-hashtag"></i>
+                        <a class="text-decoration-none" href="/block/${block.hash}">${block.hash}</a>
+                    </label>
+                    <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
+                        <i class="far fa-clock"></i>
+                        ${timestamp}
+                    </div>
+                </div>
+                <div class="form-group" style="width: 200px;">
+                    <label class="form-label text-truncate" style="width: 100%;">
+                        <i class="fas fa-gift"></i>
+                        <a class="text-decoration-none  " href="/address/${block.miner}">${block.miner}</a>
+                    </label>
+                    <div class="form-label text-muted text-truncate" style="margin-top: -10px; width: 100%;">
+                        <a class="text-decoration-none" href="/txns/${block.hash}">${block.transactions.length} txns</a>
+                    </div>
+                </div>
+                <div class="form-group mt-2" style="width: 150px; margin-left: auto;">
+                    <div class="d-flex justify-content-end">
+                        <span class="badge bg-info text-dark text-truncate" style="line-height: 35px;">
+                            ${block.reward} MEC
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    `;
+}

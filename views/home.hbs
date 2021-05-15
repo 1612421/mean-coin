@@ -15,7 +15,7 @@
             </div>
             <div data-bs-spy="scroll" data-bs-target="#navbar-example2" data-bs-offset="0" class="scrollspy-example" tabindex="0"
                 style="overflow-y: scroll; height: 450px;">
-                <table class="table table-hover">
+                <table class="table table-hover" id="latestBlockTable">
                     <tbody>
                         {{#if hasBlocks}}
                         {{#each top10Blocks}}
@@ -52,10 +52,6 @@
                             </td>
                         </tr>
                         {{/each}}
-                        {{else}}
-                        <tr>
-                            <td>BlockChain is empty</td>
-                        </tr>
                         {{/if}}
                     </tbody>
                 </table>
@@ -108,10 +104,6 @@
                             </td>
                         </tr>
                         {{/each}}
-                        {{else}}
-                        <tr>
-                            <td>Transactions is empty</td>
-                        </tr>
                         {{/if}}
                     </tbody>
                 </table>

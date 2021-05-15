@@ -5,6 +5,7 @@ const { eventEmitter } = require('../common/events');
 
 const eventConstants = {
     sendTransaction: 'TRANSACTION',
+    sendNewBlockToClientRoom: 'BLOCK',
     minedBlock: 'MINED_BLOCK',
     invalidBlock: 'INVALID_BLOCK',
     clientRoom: 'client',
@@ -36,6 +37,8 @@ async function createSocketListener (server) {
             if (BlockchainStore.isNewBlockValid(data.newMinedBlock)) {
                 BlockchainStore.chain.push(data.newMinedBlock);
                 eventEmitter.emit(data.id, { code: 200, message: 'block is valid'});
+                //sendTransactionToClientRoom(data.newMinedBlock.timestamp, data.newMinedBlock.transactions);
+                sendNewBlockToClientRoom(ata.newMinedBlock);
             } else {
                 eventEmitter.emit(data.id, { code: 500, message: 'block is invalid'});
             }
@@ -53,6 +56,10 @@ function sendTransactionToClientRoom(timestamp, transactions) {
     io.to(eventConstants.clientRoom).emit(eventConstants.sendTransaction, {
         timestamp, transactions
     })
+}
+
+function sendNewBlockToClientRoom(newBlock) {
+    io.to(eventConstants.clientRoom).emit(eventConstants.sendNewBlockToClientRoom, newBlock);
 }
 
 async function broadcastNewMinedBlock(newMinedBlock) {
@@ -92,6 +99,7 @@ async function broadcastNewMinedBlock(newMinedBlock) {
 
 
 module.exports = {
+    sendNewBlockToClientRoom,
     createSocketListener,
     sendTransactionToClientRoom,
     broadcastNewMinedBlock,

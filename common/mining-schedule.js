@@ -3,7 +3,7 @@ const miningWorker = require('../blockchain/worker-mining');
 const { BlockchainStore } = require('../blockchain/blockchain-store');
 const { Transaction } = require('../blockchain/blockchain');
 const APP_CONFIG = require('../config/constant');
-const { sendTransactionToClientRoom, broadcastNewMinedBlock } = require('../blockchain/networkMaster');
+const { sendTransactionToClientRoom, broadcastNewMinedBlock, sendNewBlockToClientRoom } = require('../blockchain/networkMaster');
 var job = null;
 
 function startMineBlockSchedule() {
@@ -45,8 +45,8 @@ function startMineBlockSchedule() {
         }
 
         if (newMinedBlock) {
-            sendTransactionToClientRoom(newMinedBlock.timestamp,  newMinedBlock.transactions);
-            
+            //sendTransactionToClientRoom(newMinedBlock.timestamp,  newMinedBlock.transactions);
+            sendNewBlockToClientRoom(newMinedBlock);
         }
     });
 }
