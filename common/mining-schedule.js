@@ -1,52 +1,47 @@
 const cron = require('node-cron');
 const miningWorker = require('../blockchain/worker-mining');
-const { BlockchainStore } = require('../blockchain/blockchain-store');
+const { Data } = require('../blockchain/blockchain-store');
 const { Transaction } = require('../blockchain/blockchain');
 const APP_CONFIG = require('../config/constant');
-const { sendTransactionToClientRoom, broadcastNewMinedBlock, sendNewBlockToClientRoom } = require('../blockchain/networkMaster');
+const { broadcastNewMinedBlock, sendNewBlockToClientRoom } = require('../blockchain/networkMaster');
+const { sendNewMinedBlockToMaster } = require('../blockchain/networkClient');
 var job = null;
 
 function startMineBlockSchedule() {
     job = cron.schedule('*/2 * * * * *', async () => {
-        if (BlockchainStore.isMining || BlockchainStore.pendingTransactions.length === 0) {
+        if (Data.BlockchainStore.isMining || Data.BlockchainStore.pendingTransactions.length === 0) {
             return;
         }
 
-        BlockchainStore.isMining = true;
+        Data.BlockchainStore.isMining = true;
         const miningData = {
-            transactions: BlockchainStore.pendingTransactions,
-            index: BlockchainStore.chain.length,
+            transactions: Data.BlockchainStore.pendingTransactions,
+            index: Data.BlockchainStore.chain.length,
             miningRewardAddress: process.env.MINER_ADDRESS,
-            preHash: BlockchainStore.getLatestBlock().hash,
-            miningReward: BlockchainStore.miningReward,
-            difficulty: BlockchainStore.difficulty
+            preHash: Data.BlockchainStore.getLatestBlock().hash,
+            miningReward: Data.BlockchainStore.miningReward,
+            difficulty: Data.BlockchainStore.difficulty
         };
-        
-        let newMinedBlock = null;
 
         try {
-            BlockchainStore.pendingTransactions = [];
-            newMinedBlock = await miningWorker.runWorker(miningData);
-            newMinedBlock.index = BlockchainStore.chain.length;
+            Data.BlockchainStore.pendingTransactions = [];
+            const newMinedBlock = await miningWorker.runWorker(miningData);
+            newMinedBlock.index = Data.BlockchainStore.chain.length;
+            //console.log(newMinedBlock);
 
-            if (BlockchainStore.isNewBlockValid(newMinedBlock)) {
-                BlockchainStore.chain.push(newMinedBlock);
-            } else {
-                throw new Error('block is valid');
-            }
+            await Promise.all([
+                broadcastNewMinedBlock(newMinedBlock),
+                sendNewMinedBlockToMaster(newMinedBlock)
+            ]);
 
-            await broadcastNewMinedBlock(newMinedBlock);
+            Data.BlockchainStore.chain.push(newMinedBlock);
+            sendNewBlockToClientRoom(newMinedBlock);
         } catch (err) {
             console.log(err);
             newMinedBlock = null;
-            BlockchainStore.pendingTransactions.push(miningData.transactions);
+            Data.BlockchainStore.pendingTransactions.push(...miningData.transactions);
         } finally {
-            BlockchainStore.isMining = false;
-        }
-
-        if (newMinedBlock) {
-            //sendTransactionToClientRoom(newMinedBlock.timestamp,  newMinedBlock.transactions);
-            sendNewBlockToClientRoom(newMinedBlock);
+            Data.BlockchainStore.isMining = false;
         }
     });
 }

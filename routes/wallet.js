@@ -4,14 +4,14 @@ const router = express.Router();
 const multer = require('../config/multer-memory');
 const { MeanWallet } = require('../blockchain/keypair');
 const isAccessWallet = require('../middleware/check-auth');
-const { BlockchainStore } = require('../blockchain/blockchain-store');
+const { Data } = require('../blockchain/blockchain-store');
 const Wallet = require('ethereumjs-wallet').default;
 const { json } = require('body-parser');
 
 router.get('/', isAccessWallet, (req, res) => {
     const messages = req.flash('error');
     const address = req.session.wallet.address;
-    const detail = BlockchainStore.getDetailOfAddress(address);
+    const detail = Data.BlockchainStore.getDetailOfAddress(address);
 
     res.render('wallet', {
         address,
@@ -86,8 +86,8 @@ router.post('/buy', isAccessWallet, (req, res) => {
         });
     }
     try {
-        const tx = BlockchainStore.createBuyTransaction(req.session.wallet.address, amount);
-        BlockchainStore.addTransaction(tx);
+        const tx = Data.BlockchainStore.createBuyTransaction(req.session.wallet.address, amount);
+        Data.BlockchainStore.addTransaction(tx);
     } catch (err) {
         res.status(500);
         return res.json({
@@ -108,20 +108,20 @@ router.post('/buy', isAccessWallet, (req, res) => {
 router.post('/send', isAccessWallet, (req, res) => {
     const { amount, address } = req.body;
 
-    if (amount <= 0) {
+    if (amount <= 0 || address === req.session.wallet.address) {
         res.status(400);
 
         return res.json({
             code: 400,
-            message: 'Invalid amount'
+            message: 'Invalid credentials'
         });
     }
     
     try {
         const privateKey = Buffer.from(req.session.wallet.privateKey);
         const wallet = Wallet.fromPrivateKey(privateKey);
-        const tx = BlockchainStore.createTransaction(wallet, address, amount, 'Transfer');
-        BlockchainStore.addTransaction(tx);
+        const tx = Data.BlockchainStore.createTransaction(wallet, address, amount, 'Transfer');
+        Data.BlockchainStore.addTransaction(tx);
     } catch (err) {
         res.status(500);
         return res.json({

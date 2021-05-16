@@ -1,5 +1,4 @@
 require('dotenv').config();
-require('./blockchain/blockchain-store');
 
 const createError = require('http-errors');
 const express = require('express');
@@ -49,6 +48,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(session({
+    name: `${process.argv[2]}.sid`,
     secret: 'fit-hcmus',
     resave: false,
     saveUninitialized: false,

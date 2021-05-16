@@ -4,7 +4,7 @@ const router = express.Router();
 const multer = require('../config/multer-memory');
 const { MeanWallet } = require('../blockchain/keypair');
 const isAccessWallet = require('../middleware/check-auth');
-const { BlockchainStore } = require('../blockchain/blockchain-store');
+const { Data } = require('../blockchain/blockchain-store');
 const Wallet = require('ethereumjs-wallet').default;
 
 // GET /blocks
@@ -15,7 +15,7 @@ router.get('/blocks/:offset', (req, res) => {
     }
 
     const offset = +req.params.offset;
-    const blocks = BlockchainStore.getBlockPagination(offset, 25);
+    const blocks = Data.BlockchainStore.getBlockPagination(offset, 25);
 
     res.render('list_block', {
         hasBlock: blocks.blocks.length > 0,
@@ -30,7 +30,7 @@ router.get('/blocks/:offset', (req, res) => {
 
 // GET /block/:blockHash
 router.get('/block/:blockHash', (req, res) => {
-    const block = BlockchainStore.findBlock(req.params.blockHash);
+    const block = Data.BlockchainStore.findBlock(req.params.blockHash);
 
     if (!block) {
         req.flash('error', 'Page is not found');
@@ -55,7 +55,7 @@ router.get('/transactions/:offset', (req, res) => {
     let isHavePre = false;
     let isHaveNext= false;
 
-    let transactions = BlockchainStore.getTopLatestTransactions(10000);
+    let transactions = Data.BlockchainStore.getTopLatestTransactions(10000);
     const maxAmount = transactions.length;
     const maxOffset = Math.ceil(maxAmount / limit);
 
@@ -92,7 +92,7 @@ router.get('/transactions/:offset', (req, res) => {
 router.get('/address/:address', (req, res) => {
     const messages = req.flash('error');
     const address = req.params.address;
-    const detail = BlockchainStore.getDetailOfAddress(address);
+    const detail = Data.BlockchainStore.getDetailOfAddress(address);
 
     if (detail.balance === 0 && detail.transactions.length === 0) {
         req.flash('error', 'Page is not found');
@@ -111,7 +111,7 @@ router.get('/address/:address', (req, res) => {
 
 // GET /txns/:blockHash
 router.get('/txns/:blockHash', (req, res) => {
-    const block = BlockchainStore.findBlock(req.params.blockHash);
+    const block = Data.BlockchainStore.findBlock(req.params.blockHash);
 
     if (!block) {
         req.flash('error', 'Page is not found');
@@ -127,7 +127,7 @@ router.get('/txns/:blockHash', (req, res) => {
 
 // GET /tx/:transactionHash
 router.get('/tx/:transactionHash', (req, res) => {
-    const transaction = BlockchainStore.findTransaction(req.params.transactionHash);
+    const transaction = Data.BlockchainStore.findTransaction(req.params.transactionHash);
 
     if (!transaction) {
         req.flash('error', 'Page is not found');

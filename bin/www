@@ -3,18 +3,33 @@
 /**
  * Module dependencies.
  */
+ const { connectToNode } = require('../blockchain/networkClient');
+ const { initBlockchain, Data } = require('../blockchain/blockchain-store');
+
+if (process.argv[4]) {
+  console.log('found node needing to connect...');
+  connectToNode(process.argv[4]);
+} else {
+  initBlockchain();
+  console.log(JSON.stringify(Data.BlockchainStore));
+}
 
 var app = require('../app');
 var debug = require('debug')('meancoin:server');
 var http = require('http');
-const SocketIo = require('socket.io');
 const { createSocketListener } = require('../blockchain/networkMaster');
 
 /**
  * Get port from environment and store in Express.
  */
+var port = process.argv[3];
 
-var port = normalizePort(process.env.PORT || '3000');
+if (port) {
+  port = parseInt(port);
+} else {
+  port = normalizePort(process.env.PORT || '3000');
+}
+
 app.set('port', port);
 
 /**
@@ -23,6 +38,7 @@ app.set('port', port);
 
 var server = http.createServer(app);
 createSocketListener(server);
+
 
 /**
  * Listen on provided port, on all network interfaces.
@@ -98,3 +114,4 @@ function onListening() {
   debug('Listening on ' + bind);
   console.log('Listening on ' + bind);
 }
+

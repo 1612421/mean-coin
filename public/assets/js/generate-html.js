@@ -115,3 +115,43 @@ function newRecordLatestBlockTable(block) {
     </tr>
     `;
 }
+
+function newRecordLatestTxTb(transaction) {
+    const timestamp = moment(+transaction.timestamp).format('MM-DD-YYYY H:mm:ss');
+
+    return `
+    <tr>
+        <td>
+            <div class="d-flex" style="margin-bottom: -10px;">
+                <div class="form-group me-5">
+                    <label class="form-label text-truncate " for="adr" style="width: 200px;">
+                        <i class="fas fa-hashtag"></i>
+                        <a class="text-decoration-none" href="/tx/${transaction.hash}">${transaction.hash}</a>
+                    </label>
+                    <div class="form-label text-muted" style="margin-top: -10px; font-size: 17px;">
+                        <i class="far fa-clock"></i>
+                        ${timestamp}
+                    </div>
+                </div>
+                <div class="form-group" style="width: 200px;">
+                    <label class="form-label text-truncate" style="width: 100%;">
+                        From
+                        <a class="text-decoration-none  " href="/address/${transaction.fromAddress}">${transaction.fromAddress}</a>
+                    </label>
+                    <div class="form-label text-truncate" style="margin-top: -10px; width: 100%;">
+                        To
+                        <a class="text-decoration-none" href="/address/${transaction.toAddress}">${transaction.toAddress}</a>
+                    </div>
+                </div>
+                <div class="form-group mt-2" style="width: 150px; margin-left: auto;">
+                    <div class="d-flex justify-content-end">
+                        <span class="badge bg-info text-dark text-truncate" style="line-height: 35px;">
+                            ${transaction.amount} MEC
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </td>
+    </tr>
+    `;
+}

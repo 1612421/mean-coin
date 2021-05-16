@@ -4,6 +4,7 @@ const ec = new EC('secp256k1');
 const EthUtil = require('ethereumjs-util');
 const Wallet = require('ethereumjs-wallet').default;
 const sizeof = require('object-sizeof');
+const { v4: uuid } = require('uuid');
 
 class Transaction {
     constructor(fromAddress, toAddress, amount, method = 'transfer') {
@@ -11,11 +12,12 @@ class Transaction {
         this.toAddress = toAddress;
         this.amount = amount;
         this.method = method;
+        this.salt = uuid();
         this.hash = this.calculateHash().toString('hex');
     }
 
     calculateHash() {
-        const tx = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount + this.method).toString());
+        const tx = Buffer.from(SHA256(this.fromAddress + this.toAddress + this.amount + this.method + this.salt).toString());
         return EthUtil.hashPersonalMessage(tx);
     }
 
@@ -89,12 +91,12 @@ class Block {
 }
 
 class BlockChain {
-    constructor(difficulty, initCoin) {
+    constructor(difficulty) {
         this.isMining = false;
         this.difficulty = difficulty;
         this.pendingTransactions = [];
         this.miningReward = 100; // 100 USD 
-        this.chain = [this.createGenesisBlock(initCoin)];
+        this.chain = [];
         this.isSyncing = false;
     }
 
@@ -102,8 +104,7 @@ class BlockChain {
         const tx = new Transaction('MeanMaster', 'MeanMasterWallet', initCoin);
         let block = new Block(0, [tx], null);
         block.mineBlock(this.difficulty);
-
-        return block;
+        this.chain.push(block);
     }
 
     getLatestBlock() {
@@ -211,17 +212,20 @@ class BlockChain {
         newBlockObject.timestamp = newBlock.timestamp;
         newBlockObject.nonce = newBlock.nonce;
         newBlockObject.reward = newBlock.reward;
-        newBlockObject.hash = newBlockObject.calculateHash();
+        newBlockObject.hash = newBlock.hash;
 
-        if (latestBlock.index !== newBlock.index - 1) {
+        if (+latestBlock.index !== +newBlock.index - 1) {
+            //console.log(latestBlock.index, newBlock.index);
             return false
         }
 
-        if (newBlock.hash !== newBlockObject.hash) {
+        if (newBlockObject.calculateHash() !== newBlockObject.hash) {
+            //console.log('khác hash')
             return false;
         }
 
         if (newBlock.previousHash !== latestBlock.hash) {
+            //console.log(newBlock.previousHash, latestBlock.hash);
             return false;
         }
 
@@ -295,7 +299,7 @@ class BlockChain {
         if (offset <= 0|| maxOffset < offset) {
             blocks = [];
         } else if (maxOffset === offset) {
-            blocks = this.chain.slice(1, limit);
+            blocks = this.chain.slice(1, limit).reverse();
         } else {
             blocks = this.chain.slice(length - offset * limit, length - offset * limit + limit).reverse();
         }

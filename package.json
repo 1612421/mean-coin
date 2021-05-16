@@ -5,7 +5,8 @@
   "main": "./src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node --experimental-worker ./bin/www"
+    "node_1": "node --experimental-worker ./bin/www node_1 3001",
+    "node_2": "node --experimental-worker ./bin/www node_2 3002 http://localhost:3001"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +34,7 @@
     "node-cron": "^3.0.0",
     "object-sizeof": "^1.6.1",
     "socket.io": "^4.0.1",
+    "socket.io-client": "^4.1.1",
     "uuid": "^3.0.0"
   }
 }

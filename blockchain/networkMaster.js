@@ -1,15 +1,17 @@
 const socketIo= require('socket.io');
 const { v4: uuid } = require('uuid');
-const { BlockchainStore } = require('../blockchain/blockchain-store');
+const { Data } = require('../blockchain/blockchain-store');
+const { sendNewMinedBlockToMasterNoWait, connectToNode } = require('./networkClient');
 const { eventEmitter } = require('../common/events');
 
 const eventConstants = {
     sendTransaction: 'TRANSACTION',
     sendNewBlockToClientRoom: 'BLOCK',
-    minedBlock: 'MINED_BLOCK',
-    invalidBlock: 'INVALID_BLOCK',
+    newMinedBlock: 'NEW_MINED_BLOCK',
     clientRoom: 'client',
-    nodeRoom: 'node'
+    nodeRoom: 'node',
+    syncBlockchain: 'SYNC_BLOCKCHAIN',
+    responseBlock: 'RESPONSE_BLOCK'
 }
 
 const nodeNumber = {};
@@ -23,26 +25,50 @@ async function createSocketListener (server) {
         });
 
         socket.on('node', () => {
-            socket.join(eventConstants.nodeRoom);
-            socket.room = eventConstants.nodeRoom;
+            try {
+                socket.join(eventConstants.nodeRoom);
+                socket.room = eventConstants.nodeRoom;
 
-            if (nodeNumber[eventConstants.nodeRoom] == undefined) {
-                nodeNumber[socket.room] = 1;
-            } else {
-                nodeNumber[socket.room]++;
+                if (nodeNumber[eventConstants.nodeRoom] == undefined) {
+                    nodeNumber[socket.room] = 1;
+                } else {
+                    nodeNumber[socket.room]++;
+                }
+
+                console.log('has new node connected');
+            } catch (error) {
+                console.log(error);
             }
         });
 
+        // receive a new mined block from node client
         socket.on(eventConstants.newMinedBlock, (data) => {
-            if (BlockchainStore.isNewBlockValid(data.newMinedBlock)) {
-                BlockchainStore.chain.push(data.newMinedBlock);
-                eventEmitter.emit(data.id, { code: 200, message: 'block is valid'});
-                //sendTransactionToClientRoom(data.newMinedBlock.timestamp, data.newMinedBlock.transactions);
-                sendNewBlockToClientRoom(ata.newMinedBlock);
+            if (Data.BlockchainStore.isNewBlockValid(data.newMinedBlock)) {
+                // continue send this block to all connected node except sender
+                socket.broadcast.to(eventConstants.nodeRoom).emit(eventConstants.newMinedBlock, data);
+
+                // continue send this block to master
+                sendNewMinedBlockToMasterNoWait(data.newMinedBlock);
+
+                // send response block is valid to sender
+                socket.emit(eventConstants.responseBlock , { id: data.id, code: 200, message: 'block is valid' });
+
+                Data.BlockchainStore.chain.push(data.newMinedBlock);
+                sendNewBlockToClientRoom(data.newMinedBlock);
             } else {
-                eventEmitter.emit(data.id, { code: 500, message: 'block is invalid'});
+                // send response block is invalid to sender
+                socket.emit(eventConstants.responseBlock , { id: data.id, code: 500, message: 'block is invalid' });
             }
         });
+
+        socket.on(eventConstants.responseBlock, (data) => {
+           eventEmitter.emit(data.id, data); 
+        });
+
+
+        socket.on(eventConstants.syncBlockchain, (data) => {
+            socket.emit(data.id, Data.BlockchainStore);
+        })
 
         socket.on('disconnect', () => {
             nodeNumber[socket.room]--;
@@ -64,32 +90,31 @@ function sendNewBlockToClientRoom(newBlock) {
 
 async function broadcastNewMinedBlock(newMinedBlock) {
     return new Promise((resolve, reject) => {
-        
         try {
+            if (!(nodeNumber[eventConstants.nodeRoom] && nodeNumber[eventConstants.nodeRoom] > 0)) {
+                resolve(true);
+            }
+
             const id = uuid();
-            io.to(eventConstants.nodeRoom).emit(eventConstants.minedBlock, {
+            io.to(eventConstants.nodeRoom).emit(eventConstants.newMinedBlock, {
                 newMinedBlock,
                 id
             });
 
-            if (nodeNumber[eventConstants.nodeRoom] && nodeNumber[eventConstants.nodeRoom] > 0) {
-                eventEmitter.on(id, (data) => {
-                    eventEmitter.removeAllListeners(id)
+            eventEmitter.once(id, (data) => {
 
-                    if (data.code !== 200) {
-                        reject(new Error(data.message));
-                    }
+                if (+data.code !== 200) {
+                    console.log(data.code, typeof(data.code));
+                    reject(new Error(data.message));
+                }
 
-                    resolve(true);
-                });
-
-                setTimeout(() => {
-                    eventEmitter.removeAllListeners(id);
-                    resolve(true)
-                }, 30000);
-            } else {
                 resolve(true);
-            }
+            });
+
+            setTimeout(() => {
+                eventEmitter.removeAllListeners(id);
+                resolve(true)
+            }, 30000);
 
         } catch (err) {
             reject(err);
@@ -97,11 +122,19 @@ async function broadcastNewMinedBlock(newMinedBlock) {
     });
 }
 
+function broadcastNewMinedBlockNoWait(newMinedBlock) {
+    const id = uuid();
+    io.to(eventConstants.nodeRoom).emit(eventConstants.newMinedBlock, {
+        newMinedBlock,
+        id
+    });
+}
 
 module.exports = {
     sendNewBlockToClientRoom,
     createSocketListener,
     sendTransactionToClientRoom,
     broadcastNewMinedBlock,
-    eventConstants
+    eventConstants,
+    broadcastNewMinedBlockNoWait
 }
