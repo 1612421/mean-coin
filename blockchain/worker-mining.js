@@ -1,15 +1,15 @@
-const { Worker } = require('worker_threads');
+const workerFarm = require('worker-farm');
+const service = workerFarm(require.resolve('./mining-script.js'));
 
 function runWorker(workerData) {
     return new Promise((resolve, reject) => {
-        const worker = new Worker(`${__dirname}/mining-script.js`, { workerData });
-        worker.on('message', resolve);
-        worker.on('error', reject);
-        worker.on('exit', (code) => {
-            if (code !== 0) {
-                reject(new Error(`Worker stopped with exit code ${code}`));
+       service(workerData, (err, output) => {
+            if (err) {
+                reject(err);
             }
-        });
+
+            resolve(output);
+       });
     });
 }
 

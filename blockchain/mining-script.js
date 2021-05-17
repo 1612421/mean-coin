@@ -1,11 +1,10 @@
-const { BlockChain, Block, Transaction } = require('./blockchain');
-const { workerData, parentPort } = require('worker_threads');
+const { Block, Transaction } = require('./blockchain');
 const APP_CONFIG = require('../config/constant');
 
 function mineBlock(data) {
     const { index, transactions, miningRewardAddress, preHash, miningReward, difficulty } = data;
     if (transactions.length === 0) {
-        return;
+        return null;
     }
 
     // create transaction reward for miner
@@ -16,10 +15,15 @@ function mineBlock(data) {
     const block = new Block(index, transactions, miningRewardAddress, preHash);
     block.reward = miningReward;
     block.mineBlock(difficulty);
-    console.log('Block successfully mined!');
+    //console.log('Block successfully mined!');
     
     return block;
 }
 
-const block = mineBlock(workerData);
-parentPort.postMessage(block);
+module.exports = (input, callback) => {
+    try {
+        callback(null, mineBlock(input));
+    } catch (err) {
+        callback(err);
+    }
+}

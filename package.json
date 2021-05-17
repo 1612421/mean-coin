@@ -5,8 +5,9 @@
   "main": "./src/app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "node_1": "node --experimental-worker ./bin/www node_1 3001",
-    "node_2": "node --experimental-worker ./bin/www node_2 3002 http://localhost:3001"
+    "node_1": "node ./bin/www node_1 3001",
+    "node_2": "node ./bin/www node_2 3002 http://localhost:3001",
+    "node_3": "node ./bin/www node_3 3003 http://localhost:3002"
   },
   "author": "",
   "license": "ISC",
@@ -22,19 +23,20 @@
     "ethereumjs-util": "^7.0.10",
     "ethereumjs-wallet": "^1.0.1",
     "express": "^4.17.1",
-    "express-handlebars": "^5.3.1",
+    "express-handlebars": "^5.3.2",
     "express-session": "^1.17.1",
     "handlebars-intl": "^1.1.2",
-    "http-errors": "^1.7.2",
+    "http-errors": "^1.8.0",
     "keythereum": "^1.2.0",
     "moment": "^2.29.1",
-    "mongoose": "^5.12.7",
+    "mongoose": "^5.12.9",
     "morgan": "^1.10.0",
     "multer": "^1.4.2",
     "node-cron": "^3.0.0",
     "object-sizeof": "^1.6.1",
-    "socket.io": "^4.0.1",
+    "socket.io": "^4.1.1",
     "socket.io-client": "^4.1.1",
-    "uuid": "^3.0.0"
+    "uuid": "^3.4.0",
+    "worker-farm": "^1.7.0"
   }
 }

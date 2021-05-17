@@ -27,7 +27,6 @@ function startMineBlockSchedule() {
             Data.BlockchainStore.pendingTransactions = [];
             const newMinedBlock = await miningWorker.runWorker(miningData);
             newMinedBlock.index = Data.BlockchainStore.chain.length;
-            //console.log(newMinedBlock);
 
             await Promise.all([
                 broadcastNewMinedBlock(newMinedBlock),
@@ -38,7 +37,6 @@ function startMineBlockSchedule() {
             sendNewBlockToClientRoom(newMinedBlock);
         } catch (err) {
             console.log(err);
-            newMinedBlock = null;
             Data.BlockchainStore.pendingTransactions.push(...miningData.transactions);
         } finally {
             Data.BlockchainStore.isMining = false;
